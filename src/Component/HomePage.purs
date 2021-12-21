@@ -7,6 +7,7 @@ import Halogen.HTML as HH
 import Data.Maybe
 import Effect.Aff.Class (class MonadAff)
 import Data.Route
+import Conduit.Component.HTML.Footer
 data Action
   = MoveToGame
 
@@ -33,4 +34,7 @@ handleAction r = case r of
 
 render :: forall slots m. MonadAff m => State -> H.ComponentHTML Action slots m
 render {} =
-  HH.div_ [ header Nothing Home ]
+  HH.div_ [
+            ( header Nothing Home )
+          , footer
+          ]

@@ -1,6 +1,7 @@
 module Component.Router where
 
 import Prelude
+import Debug
 import Data.Either (hush)
 import Halogen.HTML.Events as HE
 import Data.Foldable (elem)
@@ -66,7 +67,10 @@ routerComponent =
   H.mkComponent
     { initialState
     , render
-    , eval: H.mkEval $ H.defaultEval {handleAction = handleAction}
+    , eval: H.mkEval $ H.defaultEval
+      { handleAction = handleAction
+      , handleQuery = handleQuery
+      }
     }
 
 handleAction :: forall m. MonadAff m => Action -> H.HalogenM State Action ChildSlots Void m Unit
@@ -74,8 +78,17 @@ handleAction = case _ of
   ChangePage -> do
     state <- H.get
     let
-      newState = state { route = Just Home }
+      newState = trace "Plumba" \_ -> state { route = Just Home }
     H.put newState
   _ -> do
     state <- H.get
     H.put state
+
+
+handleQuery :: forall a m. MonadAff m => Query a -> H.HalogenM State Action ChildSlots Void m (Maybe a)
+handleQuery = case _ of
+  Navigate dest a -> do
+    { route, currentUser } <- trace "Plumba" \_ ->  H.get
+    do
+      trace "Hello" \_ ->  H.modify_ _ { route = Just dest }
+    pure $ Just a

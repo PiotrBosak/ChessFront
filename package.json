@@ -11,6 +11,7 @@
     "serve": "http-server dist",
     "serve-dev": "parcel dev/index.html --open",
     "test": "spago test",
+    "all": "npm install && spago build && npm run bundle:build && npm run bundle:dce && npm run bundle:parcel && parcel dev/index.html --open",
     "bundle:build": "spago build --purs-args '--codegen corefn'",
     "bundle:dce": "zephyr -f Main.main",
     "bundle:parcel": "parcel build assets/index.html --public-url '.' --no-source-maps",
