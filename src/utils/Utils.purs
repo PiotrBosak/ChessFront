@@ -2,7 +2,6 @@ module Utils where
 
 import Prelude
 
-import Data.Maybe (Maybe(..))
 import Halogen.HTML as HH
 import Halogen.HTML.Properties as HP
 

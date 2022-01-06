@@ -112,7 +112,7 @@ maybeImage (Tile tile) =
 pieceImage (Piece p) = HP.src ("pieces/" <> (imageName {pieceType: p.pieceType, color: p.color}))
 pieceStyle = HC.style $ C.width (C.pct  (toNumber 85)) *> C.display C.block
 
-imageName :: {pieceType :: PieceType, color :: PieceColor } -> String
+imageName :: { pieceType :: PieceType, color :: PieceColor } -> String
 imageName = case _ of
     {pieceType : Pawn, color: WhitePiece} -> "whitePawn.png"
     {pieceType : Bishop, color: WhitePiece} -> "whiteBishop.png"

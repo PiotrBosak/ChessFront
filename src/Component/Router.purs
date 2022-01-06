@@ -22,7 +22,6 @@ import Data.Maybe
 import Component.HomePage
 
 data Query a = Navigate Route a
-
 type State =
   { route :: Maybe Route
   , currentUser :: Maybe Profile
@@ -32,9 +31,11 @@ data Action
   = Initialize
   | ChangePage
   | Receive (Connected (Maybe Profile) Unit)
+  | HandleButton Output
 
 
-type OpaqueSlot slot = forall query. H.Slot query Void slot
+--this is not opaque anymore tbh
+type OpaqueSlot slot = forall query. H.Slot query Output slot
 
 type ChildSlots =
   ( home :: OpaqueSlot Unit
@@ -54,9 +55,9 @@ render { route, currentUser }  = case route of
           , HH.button [ HE.onClick \_ -> ChangePage ] [HH.text "click me" ]
            ]
     Just Home ->
-      HH.slot_ (Proxy :: _ "home") unit homeComponent unit
+      HH.slot (Proxy :: _ "home") unit homeComponent unit HandleButton
     Just Game ->
-      HH.slot_ (Proxy :: _ "game") unit boardComponent unit
+      HH.slot_ (Proxy :: _ "game") unit (trace "plumbulka" \_ -> boardComponent) unit
 
 routerComponent
   :: forall m
@@ -76,10 +77,12 @@ routerComponent =
 handleAction :: forall m. MonadAff m => Action -> H.HalogenM State Action ChildSlots Void m Unit
 handleAction = case _ of
   ChangePage -> do
-    state <- H.get
+    state <- trace "Hit change page" \_ -> H.get
     let
-      newState = trace "Plumba" \_ -> state { route = Just Home }
+      newState = trace "Plumba1" \_ -> state { route = Just Game }
     H.put newState
+  HandleButton _ -> do
+    H.modify_ _ { route = Just Game }
   _ -> do
     state <- H.get
     H.put state
@@ -88,7 +91,8 @@ handleAction = case _ of
 handleQuery :: forall a m. MonadAff m => Query a -> H.HalogenM State Action ChildSlots Void m (Maybe a)
 handleQuery = case _ of
   Navigate dest a -> do
-    { route, currentUser } <- trace "Plumba" \_ ->  H.get
+    { route, currentUser } <- trace "Plumba2" \_ ->  H.get
     do
       trace "Hello" \_ ->  H.modify_ _ { route = Just dest }
+    _ <- trace (show route) \_ -> pure unit
     pure $ Just a

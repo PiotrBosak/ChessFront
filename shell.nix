@@ -1,6 +1,6 @@
 let
   pkgs = import (builtins.fetchTarball {
-    url = "https://github.com/NixOS/nixpkgs/archive/21.05.tar.gz";
+    url = "https://github.com/NixOS/nixpkgs/archive/21.11.tar.gz";
   }) {};
 
   # To update to a newer version of easy-purescript-nix, run:
@@ -10,16 +10,21 @@ let
   pursPkgs = import (pkgs.fetchFromGitHub {
     owner = "justinwoo";
     repo = "easy-purescript-nix";
-    rev = "eb64583e3e15749b3ae56573b2aebbaa9cbab4eb";
-    sha256 = "0hr7smk7avdgc5nm1r3drq91j1hf8wimp7sg747832345c8vq19a";
+    rev = "678070816270726e2f428da873fe3f2736201f42";
+    sha256 = "13l9c1sgakpmh9f23201s8d1lnv0zz0q1wsr1lc92wdpkxs9nii4";
   }) { inherit pkgs; };
 
 in pkgs.stdenv.mkDerivation {
   name = "halogen-realworld";
   buildInputs = with pursPkgs; [
-    pursPkgs.purs
-    pursPkgs.spago
-    pursPkgs.zephyr
-    pkgs.nodejs-14_x
-  ];
+    purs
+    purs-tidy
+    spago
+    zephyr
+    pkgs.nodejs-16_x
+  ] ++ pkgs.lib.optionals pkgs.stdenv.isDarwin (with pkgs.darwin.apple_sdk.frameworks; [
+    # Apple M1
+    Cocoa
+    CoreServices
+  ]);
 }
