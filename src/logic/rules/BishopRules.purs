@@ -1,4 +1,5 @@
 module BishopRules (moves, attacks) where
+
 import Data.Tuple
 import Domain
 import Data.Array

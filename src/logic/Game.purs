@@ -1,4 +1,5 @@
 module Game where
+
 import Domain
 import Debug
 import Rules
@@ -15,6 +16,7 @@ import Data.Maybe
 import Prelude
 
 data Turn = WhiteTurn | BlackTurn
+
 derive instance eqTurn :: Eq Turn
 derive instance genericTurn :: Generic Turn _
 instance showTurn :: Show Turn where
@@ -34,11 +36,13 @@ makeGame = Game
   , turn: WhiteTurn
   , gameStatus: Cont
   }
+
 derive instance newtypeGame :: Newtype Game _
 instance showGame :: Show Game where
   show (Game g) = show g.turn
 
 data GameStatus = Cont | Finished | Checking
+
 derive instance eqGameStatus :: Eq GameStatus
 derive instance genericGameStatus :: Generic GameStatus _
 instance showGameStatus :: Show GameStatus where

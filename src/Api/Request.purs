@@ -25,6 +25,7 @@ import Web.Storage.Storage (getItem, removeItem, setItem)
 newtype BaseURL = BaseURL String
 
 newtype Token = Token String
+
 derive instance eqToken :: Eq Token
 derive instance ordToken :: Ord Token
 

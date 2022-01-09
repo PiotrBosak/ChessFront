@@ -1,0 +1,6 @@
+.boxed {
+    width: 150px;
+    padding: 50px;
+    border: 5px solid gray;
+    margin: 0;
+}

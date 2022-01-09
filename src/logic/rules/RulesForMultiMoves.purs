@@ -1,4 +1,5 @@
 module RulesForMultiMoves (moves, attacks) where
+
 import Domain
 import Data.Maybe
 import Data.Array

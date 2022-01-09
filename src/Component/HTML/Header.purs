@@ -21,7 +21,7 @@ header currentUser route =
         [ css "container" ]
         [ HH.a
             [ css "navbar-brand-black"
-            , safeHref Game
+            , safeHref Home
             ]
             [ HH.text "Chess" ]
         , HH.ul
@@ -41,7 +41,7 @@ header currentUser route =
                       [ HH.text " Settings" ]
                   ]
             , maybeElem currentUser \profile ->
-                navItem Game
+                navItem Home
                   [ HH.img
                       [ css "user-pic"
                       , HP.src $ ""

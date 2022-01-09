@@ -1,28 +1,111 @@
 <!DOCTYPE html>
 <html>
-  <head>
+<head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Conduit</title>
     <link href="//code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css" rel="stylesheet" type="text/css">
-    <link href="//fonts.googleapis.com/css?family=Titillium+Web:700|Source+Serif+Pro:400,700|Merriweather+Sans:400,700|Source+Sans+Pro:400,300,600,700,300italic,400italic,600italic,700italic" rel="stylesheet" type="text/css">
+    <link href="//fonts.googleapis.com/css?family=Titillium+Web:700|Source+Serif+Pro:400,700|Merriweather+Sans:400,700|Source+Sans+Pro:400,300,600,700,300italic,400italic,600italic,700italic"
+          rel="stylesheet" type="text/css">
     <style>
-      .navbar-brand-black {
-        font-family: titillium web,sans-serif;
-        font-size: 1.5rem!important;
-        padding-top: 0!important;
-        margin-right: 2rem !important;
-        color: black !important;
-      }
-      .logo-font-black {
-        font-family: titillium web,sans-serif;
-        color: black !important;
-      }
-    
-</style>
+        .navbar-brand-black {
+            font-family: titillium web, sans-serif;
+            font-size: 1.5rem !important;
+            padding-top: 0 !important;
+            margin-right: 2rem !important;
+            color: black !important;
+        }
+
+        .logo-font-black {
+            font-family: titillium web, sans-serif;
+            color: black !important;
+        }
+
+        /*game type chooser */
+        .gtc-button {
+            background: #333;
+            color: white;
+            text-transform: uppercase;
+            padding: 0.8em 1em;
+            border: 30px black !important;
+            cursor: pointer;
+            min-width: 200px;
+            font-size: 15px;
+            text-align: center;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            user-select: none;
+            display: inline-block;
+            transition: all 150ms;
+        }
+
+        .lobby {
+            position: relative;
+            grid-area: table;
+            justify-content: center;
+            margin: 2em 0 0 0;
+            flex-flow: column;
+            align-items: stretch;
+            float: left;
+
+        }
+        .gtc-container {
+            display: flex;
+        }
+
+        /*.gtc-wrapper {*/
+        /*    display: grid;*/
+        /*    padding: 10px;*/
+        /*    grid-template-columns: 0px 0px;*/
+        /*    grid-template-rows: 0px;*/
+        /*}*/
+
+        .gtc-grid {
+            margin: 20px auto;
+            width: 250px;
+            height: 250px;
+            background-color: #fff;
+            display: grid;
+            grid-template-columns: 150px 150px;
+            grid-row: auto;
+            grid-column-gap: 10px;
+            grid-row-gap: 10px;
+        }
+        .gtc-board {
+            float: left;
+            padding-top: 20px;
+            padding-right: 0px;
+        }
+        .gtc-play-type {
+            position: relative;
+            grid-area: table;
+            justify-content: center;
+            margin: 2em 0 0 0;
+            flex-flow: column;
+            align-items: stretch;
+            float: left;
+            padding-top: 20px;
+
+        }
+
+        .gtc-box {
+            background-color: #333;
+            padding: 20px;
+            border-radius: 10px;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 15px;
+            text-transform: uppercase;
+            font-family: sans-serif;
+        }
+
+
+    </style>
     <link rel="stylesheet" href="//demo.productionready.io/main.css">
-  </head>
-  <body>
-    <script src="/index.4ffd1239.js" defer=""></script>
-  </body>
+</head>
+<body>
+<script src="./main.js" defer=""></script>
+</body>
 </html>

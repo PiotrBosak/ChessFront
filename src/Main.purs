@@ -14,11 +14,12 @@ import Routing.Hash (matchesWith)
 import Component.BoardComponent
 import Api.Request
 import Data.Profile
+import Data.Route (routeCodec)
+import Effect.Aff (launchAff_)
 import Data.Maybe
 import Component.Router
 import Store
 
-data List a = Nil | Cons a (List a)
 main :: Effect Unit
 main = HA.runHalogenAff do
   body <- HA.awaitBody
@@ -27,20 +28,18 @@ main = HA.runHalogenAff do
     baseUrl = BaseURL "localhost:8080"
     logLevel = Dev
 
-
   currentUser :: Maybe Profile <- (liftEffect readToken) >>= case _ of
     Nothing ->
       pure Nothing
     Just token ->
       pure Nothing
 
-
   let
     initialStore :: Store
-    initialStore = { baseUrl, logLevel,currentUser}
+    initialStore = { baseUrl, logLevel, currentUser }
 
-  runUI routerComponent unit body
-
-
-
+  halogenIO <- runUI routerComponent unit body
+  void $ liftEffect $ matchesWith (parse routeCodec) \old new ->
+      when (old /= Just new) do
+        launchAff_ $ halogenIO.query $ H.mkTell $ Navigate new
 

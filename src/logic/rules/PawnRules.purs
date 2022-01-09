@@ -1,4 +1,5 @@
 module PawnRules (moves, attacks) where
+
 import Domain
 import Debug
 import Data.Tuple

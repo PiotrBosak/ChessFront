@@ -1,4 +1,5 @@
 module KnightRules where
+
 import Data.Tuple
 import Prelude
 import Domain

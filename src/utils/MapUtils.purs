@@ -1,4 +1,5 @@
 module MapUtils where
+
 import Data.Map.Internal as M
 import Data.Tuple
 import Data.Array

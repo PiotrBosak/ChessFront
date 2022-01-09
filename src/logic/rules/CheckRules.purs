@@ -1,4 +1,5 @@
 module CheckRules (isKingChecked) where
+
 import Domain
 import Control.MonadZero
 import Data.Maybe as MA

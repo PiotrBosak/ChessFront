@@ -1,4 +1,5 @@
 module KnightAndKingRules (moves, attacks) where
+
 import Data.Tuple
 import Data.Array
 import Domain

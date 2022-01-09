@@ -1,4 +1,5 @@
 module BoardFactory (createBoard) where
+
 import Domain
 import Data.Map.Internal
 import Data.Map

@@ -1,5 +1,7 @@
-module Component.BoardComponent where
+module Component.HTML.Board where
 
+
+import Prelude
 import Domain as D
 import Data.Route as DR
 import Affjax as AX
@@ -44,62 +46,59 @@ import Debug
 import Effect (Effect)
 import Effect.Aff.Class (class MonadAff)
 import Effect.Class.Console (log)
+import Halogen.HTML.Properties as HP
+import Domain
+import Domain as D
+import Data.Newtype as DN
+import Data.Array
+import CSS as C
+import CSS.Common
+import Halogen.HTML.CSS as HC
+import Data.List as L
+import Data.Map.Internal as M
+import Game
+import MapUtils as MU
+import Debug
+import Data.Either (hush)
+import Halogen.HTML.Events as HE
+import Data.Foldable (elem)
+import Data.Maybe (Maybe(..), fromMaybe, isJust)
+import Effect.Aff.Class (class MonadAff)
+import Halogen as H
+import Halogen.HTML as HH
+import Halogen.Store.Connect (Connected, connect)
+import Halogen.Store.Monad (class MonadStore)
+import Component.BoardComponent
+import Halogen.Store.Select (selectEq)
+import Routing.Duplex as RD
+import Routing.Hash (getHash)
+import Type.Proxy (Proxy(..))
+import Data.Route
+import Data.Profile
+import Data.Maybe
+import Component.HTML.Utils (css, maybeElem, safeHref, whenElem)
 
-type State =
-  { game :: Game
-  , selectedPosition :: Maybe Position
-  }
-
-data Action = Click D.Position | IsCheckOrMate
-someAction = IsCheckOrMate
-
-boardComponent
-  :: forall q o m
-   . MonadAff m
-  => H.Component q Unit o m
-boardComponent =
-  H.mkComponent
-    { initialState
-    , render
-    , eval: H.mkEval $ H.defaultEval { handleAction = handleAction }
-    }
-
-initialState :: forall input. input -> State
-initialState _ =
-  { game: makeGame
-  , selectedPosition: Nothing
-  }
-
-render :: forall m. State -> H.ComponentHTML Action () m
-render state =
-  HH.div_
-    [ header Nothing DR.Home
-    , mainComponent state
-    , footer
-    ]
-
-mainComponent :: forall m. State -> H.ComponentHTML Action () m
-mainComponent { selectedPosition: selected, game: (Game game) } =
+board =
   let
+    game = unwrap (makeGame)
     currentBoard = game.currentBoard
     groupedByRank = MU.groupByKeys (\(D.Position p) -> p.rank) currentBoard.tiles
     sortedRanks = L.reverse $ L.sort $ M.keys groupedByRank
     getUnderRank = \r -> maybe [] identity $ M.lookup r groupedByRank
   in
     HH.form
-      [ HC.style $ (C.display C.block) *> (C.marginLeft auto) *> (C.marginRight auto) ]
+      [ HC.style $ (C.display C.block) *> (C.marginLeft auto) *> (C.marginRight auto), css "gtc-board" ]
       [ HH.div
           [ HC.style $ (C.display C.block) ]
-          [ HH.h1_ [ HH.text "aaa" ]
-          , ( HH.table
+          [ ( HH.table
                 [ HC.style $ (C.borderSpacing (C.nil)) *> (C.marginLeft auto) *> (C.marginRight auto) ]
-                $ map ((\a -> renderRank a selected game.turn) <<< getUnderRank)
+                $ map ((\a -> renderRank a Nothing game.turn) <<< getUnderRank)
                 $ fromFoldable sortedRanks
             )
           ]
       ]
 
-renderRank :: forall m. Array D.Tile -> Maybe Position -> Turn -> H.ComponentHTML Action () m
+renderRank :: forall m action. Array D.Tile -> Maybe Position -> Turn -> H.ComponentHTML action () m
 renderRank tiles selected turn = HH.tr [ HC.style (C.borderSpacing (C.nil)) ] $ map (\t -> renderTile t selected turn) (sort tiles)
 
 renderTile (D.Tile tile) selected turn =
@@ -114,7 +113,7 @@ renderTile (D.Tile tile) selected turn =
         WhiteTile -> White
         BlackTile -> Black
   in
-    HH.td [ (square boardTileColor), (HE.onClick (\_ -> Click tile.position)) ] [ maybeImage (wrap tile) ]
+    HH.td [ (square boardTileColor) ] [ maybeImage (wrap tile) ]
 
 data BoardTileColor = White | Black | Selected
 
@@ -143,27 +142,6 @@ imageName = case _ of
   { pieceType: King, color: BlackPiece } -> "blackKing.png"
 
 square = case _ of
-  White -> HC.style $ C.height (C.px $ toNumber 50) *> C.width (C.px $ toNumber 50) *> C.backgroundColor (C.rgb 245 245 245) *> C.display C.inlineBlock
-  Black -> HC.style $ C.height (C.px $ toNumber 50) *> C.width (C.px $ toNumber 50) *> C.backgroundColor (C.rgb 32 32 32) *> C.display C.inlineBlock
-  Selected -> HC.style $ C.height (C.px $ toNumber 50) *> C.width (C.px $ toNumber 50) *> C.backgroundColor (C.rgb 0 127 255) *> C.display C.inlineBlock
-
-handleAction :: forall output m. MonadAff m => Action -> H.HalogenM State Action () output m Unit
-handleAction = case _ of
-  Click to ->
-    do
-      state <- H.get
-      let
-        newState = case state.selectedPosition of
-          Nothing -> state { selectedPosition = Just to }
-          Just from ->
-            if (eq from to) then state { selectedPosition = Nothing }
-            else
-              let
-                afterMove = move from to state.game
-              in
-                maybe (state { selectedPosition = Just to }) (\g -> state { game = g, selectedPosition = Nothing }) afterMove
-      H.put newState
-      handleAction IsCheckOrMate
-
-  IsCheckOrMate -> H.modify_ \s -> s { game = updateCheckOrMate (s.game) }
-
+  White -> HC.style $ C.height (C.px $ toNumber 30) *> C.width (C.px $ toNumber 30) *> C.backgroundColor (C.rgb 245 245 245) *> C.display C.inlineBlock
+  Black -> HC.style $ C.height (C.px $ toNumber 30) *> C.width (C.px $ toNumber 30) *> C.backgroundColor (C.rgb 32 32 32) *> C.display C.inlineBlock
+  Selected -> HC.style $ C.height (C.px $ toNumber 30) *> C.width (C.px $ toNumber 30) *> C.backgroundColor (C.rgb 0 127 255) *> C.display C.inlineBlock

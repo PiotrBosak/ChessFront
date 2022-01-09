@@ -13,17 +13,20 @@ import Slug as Slug
 data Route
   = Home
   | Game
+  | Board
+
 derive instance genericRoute :: Generic Route _
 derive instance eqRoute :: Eq Route
 derive instance ordRoute :: Ord Route
 instance showRoute :: Show Route where
-    show Game = "game"
-    show Home = "home"
+  show Game = "game"
+  show Home = "home"
+  show Board = "board"
 
 routeCodec :: RouteDuplex' Route
 routeCodec = root $ sum
   { "Home": noArgs
   , "Game": "game" / noArgs
+  , "Board": "board" / noArgs
   }
-
 

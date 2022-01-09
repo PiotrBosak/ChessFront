@@ -1,4 +1,5 @@
 module Domain where
+
 import Data.Maybe
 import Data.Generic.Rep (class Generic)
 import Control.Comonad.Store
@@ -19,9 +20,11 @@ data PieceType
   | Rook
   | Queen
   | King
+
 derive instance eqPieceType :: Eq PieceType
 derive instance ordPieceType :: Ord PieceType
 data PieceColor = BlackPiece | WhitePiece
+
 derive instance eqPieceColor :: Eq PieceColor
 
 data Rank
@@ -65,6 +68,7 @@ numberToRank = case _ of
 
 nextRank :: Rank -> Maybe Rank
 nextRank rank = numberToRank $ (rankToNumber rank) + 1
+
 data File
   = A
   | B
@@ -117,13 +121,16 @@ instance eqPiece :: Eq Piece where
   eq (Piece fst) (Piece snd) = (eq fst.pieceType snd.pieceType) && (eq fst.color snd.color)
 
 data TileColor = WhiteTile | BlackTile
+
 derive instance genericTileColor :: Generic TileColor _
 instance showTileColor :: Show TileColor where
   show = genericShow
+
 newtype Position = Position
   { file :: File
   , rank :: Rank
   }
+
 tileColor :: Tile -> TileColor
 tileColor (Tile tile) =
   let
@@ -170,10 +177,13 @@ instance showTile :: Show Tile where
 
 hasPiece :: Tile -> Boolean
 hasPiece (Tile t) = isJust t.currentPiece
+
 position :: Tile -> Position
 position (Tile t) = t.position
+
 isEmpty :: Tile -> Boolean
 isEmpty (Tile t) = isNothing t.currentPiece
+
 derive instance newtypeTile :: Newtype Tile _
 data Player = WhitePlayer | BlackPlayer
 
@@ -207,5 +217,6 @@ pieceAt position board =
     (Tile t) = (tileAt position board)
   in
     t.currentPiece
+
 hasMoved :: Tile -> Boolean
 hasMoved (Tile t) = t.numberOfMoves >= 0

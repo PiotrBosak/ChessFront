@@ -32,5 +32,3 @@ reduce store = case _ of
   LogoutUser ->
     store { currentUser = Nothing }
 
-
-

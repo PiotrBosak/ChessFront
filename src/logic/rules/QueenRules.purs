@@ -1,4 +1,5 @@
 module QueenRules where
+
 import Data.Tuple
 import Domain
 import Prelude
