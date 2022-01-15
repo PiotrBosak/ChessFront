@@ -1,6 +1,7 @@
 module Component.BoardComponent where
 
-import Domain as D
+import Logic.Domain as D
+import Logic.Domain
 import Data.Route as DR
 import Affjax as AX
 import Component.HTML.Header
@@ -31,12 +32,11 @@ import MapUtils as MU
 import Data.Map.Internal as M
 import Data.List as L
 import Data.Maybe
-import Domain
 import CSS as C
 import CSS.Common
 import Halogen.HTML.CSS as HC
 import Data.Array
-import Game
+import Logic.Game
 import Control.Plus
 import Data.Int
 import Prelude
@@ -90,7 +90,7 @@ mainComponent { selectedPosition: selected, game: (Game game) } =
       [ HC.style $ (C.display C.block) *> (C.marginLeft auto) *> (C.marginRight auto) ]
       [ HH.div
           [ HC.style $ (C.display C.block) ]
-          [ HH.h1_ [ HH.text "aaa" ]
+          [ HH.h1_ [ HH.text "cos jeszcze nowszego" ]
           , ( HH.table
                 [ HC.style $ (C.borderSpacing (C.nil)) *> (C.marginLeft auto) *> (C.marginRight auto) ]
                 $ map ((\a -> renderRank a selected game.turn) <<< getUnderRank)

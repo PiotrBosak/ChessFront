@@ -1,6 +1,6 @@
 module RulesForMultiMoves (moves, attacks) where
 
-import Domain
+import Logic.Domain
 import Data.Maybe
 import Data.Array
 import Data.Tuple

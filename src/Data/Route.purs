@@ -3,7 +3,7 @@ module Data.Route where
 import Prelude
 import Data.Either (note)
 import Data.Generic.Rep (class Generic)
-import Data.Profile
+import Data.Profile as Profile
 import Routing.Duplex (RouteDuplex', as, root, segment)
 import Routing.Duplex.Generic (noArgs, sum)
 import Routing.Duplex.Generic.Syntax ((/))
@@ -30,3 +30,8 @@ routeCodec = root $ sum
   , "Board": "board" / noArgs
   }
 
+slug :: RouteDuplex' String -> RouteDuplex' Slug
+slug = as Slug.toString (Slug.parse >>> note "Bad slug")
+
+uname :: RouteDuplex' String -> RouteDuplex' Profile.Username
+uname = as Profile.toString (Profile.parse >>> note "Bad username")

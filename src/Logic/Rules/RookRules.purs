@@ -3,7 +3,7 @@ module RookRules where
 import Data.Array
 import Data.Maybe
 import Data.Tuple
-import Domain
+import Logic.Domain
 import Prelude
 
 import RulesForMultiMoves as MM

@@ -1,6 +1,6 @@
 module BoardFactory (createBoard) where
 
-import Domain
+import Logic.Domain
 import Data.Map.Internal
 import Data.Map
 import Data.Maybe

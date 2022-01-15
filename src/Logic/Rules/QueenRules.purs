@@ -1,7 +1,7 @@
 module QueenRules where
 
 import Data.Tuple
-import Domain
+import Logic.Domain
 import Prelude
 import RulesForMultiMoves as MM
 

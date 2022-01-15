@@ -2,7 +2,7 @@ module Component.HTML.Board where
 
 
 import Prelude
-import Domain as D
+import Logic.Domain as D
 import Data.Route as DR
 import Affjax as AX
 import Component.HTML.Header
@@ -33,12 +33,12 @@ import MapUtils as MU
 import Data.Map.Internal as M
 import Data.List as L
 import Data.Maybe
-import Domain
+import Logic.Domain
 import CSS as C
 import CSS.Common
 import Halogen.HTML.CSS as HC
 import Data.Array
-import Game
+import Logic.Game
 import Control.Plus
 import Data.Int
 import Prelude
@@ -47,8 +47,8 @@ import Effect (Effect)
 import Effect.Aff.Class (class MonadAff)
 import Effect.Class.Console (log)
 import Halogen.HTML.Properties as HP
-import Domain
-import Domain as D
+import Logic.Domain
+import Logic.Domain as D
 import Data.Newtype as DN
 import Data.Array
 import CSS as C
@@ -56,7 +56,6 @@ import CSS.Common
 import Halogen.HTML.CSS as HC
 import Data.List as L
 import Data.Map.Internal as M
-import Game
 import MapUtils as MU
 import Debug
 import Data.Either (hush)

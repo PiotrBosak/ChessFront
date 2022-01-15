@@ -6,7 +6,7 @@ import Data.Maybe
 import Data.Newtype
 import Data.Ord
 import Data.Tuple
-import Domain
+import Logic.Domain
 import Prelude
 
 import Data.List as L

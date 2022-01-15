@@ -1,4 +1,4 @@
-module Domain where
+module Logic.Domain where
 
 import Data.Maybe
 import Data.Generic.Rep (class Generic)

@@ -11,7 +11,7 @@ import KnightRules as KNR
 import RookRules as RR
 import QueenRules as QR
 import KingRules as KR
-import Domain
+import Logic.Domain
 
 moves :: Board -> Position -> PieceType -> Array { position :: Position, moveType :: MoveType }
 moves board position pieceType = case pieceType of

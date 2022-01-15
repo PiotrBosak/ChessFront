@@ -2,7 +2,7 @@ module KnightAndKingRules (moves, attacks) where
 
 import Data.Tuple
 import Data.Array
-import Domain
+import Logic.Domain
 import Control.MonadZero
 import Data.Maybe
 import Prelude

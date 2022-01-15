@@ -1,6 +1,6 @@
 module CheckRules (isKingChecked) where
 
-import Domain
+import Logic.Domain
 import Control.MonadZero
 import Data.Maybe as MA
 import Data.Tuple
@@ -9,7 +9,7 @@ import Data.Map as M
 import Data.Newtype
 import Data.Array
 import Rules
-import Domain
+import Logic.Domain
 import Prelude
 
 isKingChecked :: Board -> PieceColor -> Boolean

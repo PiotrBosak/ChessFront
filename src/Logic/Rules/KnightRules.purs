@@ -2,7 +2,7 @@ module KnightRules where
 
 import Data.Tuple
 import Prelude
-import Domain
+import Logic.Domain
 import KnightAndKingRules as KK
 
 combinations :: Array (Tuple Int Int)

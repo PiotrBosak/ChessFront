@@ -1,7 +1,7 @@
 module BishopRules (moves, attacks) where
 
 import Data.Tuple
-import Domain
+import Logic.Domain
 import Data.Array
 import Data.Maybe
 import RulesForMultiMoves as MM

@@ -1,6 +1,6 @@
-module Game where
+module Logic.Game where
 
-import Domain
+import Logic.Domain
 import Debug
 import Rules
 import Data.Tuple
