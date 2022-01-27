@@ -2,8 +2,11 @@ module Component.Router where
 
 import Prelude
 import Debug
+import Capability.Navigate
 import Component.GameTypeChooser as GTC
+import Capability.User
 import Data.Either (hush)
+import Page.Login as Login
 import Halogen.HTML.Events as HE
 import Data.Foldable (elem)
 import Data.Maybe (Maybe(..), fromMaybe, isJust)
@@ -41,6 +44,8 @@ type ChildSlots =
   ( home :: OpaqueSlot Unit Output
   , game :: OpaqueSlot Unit Unit
   , board :: OpaqueSlot Unit GTC.Output
+  , login :: OpaqueSlot Unit Unit
+  , register :: OpaqueSlot Unit Unit
   )
 
 initialState _ =
@@ -48,7 +53,12 @@ initialState _ =
   , currentUser: Nothing
   }
 
-render :: forall m. MonadAff m => State -> H.ComponentHTML Action ChildSlots m
+render ::
+    forall m. MonadAff m
+     => ManageUser m
+     => Navigate m
+     => State
+     -> H.ComponentHTML Action ChildSlots m
 render { route, currentUser } = case route of
   Nothing ->
     HH.slot (Proxy :: _ "home") unit homeComponent unit HandleButton
@@ -58,11 +68,16 @@ render { route, currentUser } = case route of
     HH.slot (Proxy :: _ "home") unit homeComponent unit HandleButton
   Just Game ->
     HH.slot_ (Proxy :: _ "game") unit (trace "plumbulka" \_ -> boardComponent) unit
+  Just Login ->
+    HH.slot_ (Proxy :: _ "login") unit Login.component {redirect: false }
+  Just Register ->
+    HH.slot (Proxy :: _ "home") unit homeComponent unit HandleButton
 
 routerComponent
   :: forall m
    . MonadAff m
-  -- => Navigate m
+  => Navigate m
+  => ManageUser m
   => H.Component Query Unit Void m
 routerComponent =
   H.mkComponent

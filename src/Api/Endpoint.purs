@@ -2,7 +2,8 @@ module Api.Endpoint where
 import Prelude hiding ((/))
 
 import Data.Route (slug, uname)
-import Data.Profile (Username)
+import Data.Profile
+import Data.Username
 import Data.Generic.Rep (class Generic)
 import Data.Lens.Iso.Newtype (_Newtype)
 import Data.Maybe (Maybe(..))

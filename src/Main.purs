@@ -15,9 +15,10 @@ import Component.BoardComponent
 import Api.Request
 import Data.Profile
 import Data.Route (routeCodec)
-import Effect.Aff (launchAff_)
+import Effect.Aff
 import Data.Maybe
-import Component.Router
+import AppM
+import Component.Router as Router
 import Store
 
 main :: Effect Unit
@@ -38,8 +39,9 @@ main = HA.runHalogenAff do
     initialStore :: Store
     initialStore = { baseUrl, logLevel, currentUser }
 
-  halogenIO <- runUI routerComponent unit body
+  rootComponent <- runAppM initialStore Router.routerComponent
+  halogenIO <-  runUI rootComponent unit body
   void $ liftEffect $ matchesWith (parse routeCodec) \old new ->
       when (old /= Just new) do
-        launchAff_ $ halogenIO.query $ H.mkTell $ Navigate new
+        launchAff_ $ halogenIO.query $ H.mkTell $ Router.Navigate new
 

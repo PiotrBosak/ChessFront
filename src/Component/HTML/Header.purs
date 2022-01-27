@@ -49,10 +49,10 @@ header currentUser route =
                   , HH.text $ ""
                   ]
             , whenElem (isNothing currentUser) \_ ->
-                navItem Game
+                navItem Login
                   [ HH.text "Log in" ]
             , whenElem (isNothing currentUser) \_ ->
-                navItem Game
+                navItem Register
                   [ HH.text "Sign up" ]
             ]
         ]
