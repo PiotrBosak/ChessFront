@@ -5,7 +5,6 @@ import Data.StartGameResult
 import Prelude
 
 class Monad m <= StartGame m where
-    startMultiGame :: ProfileWithEmailPassword -> m StartMultiGameResult
-    startComputerGame :: ProfileWithEmailPassword -> m StartComputerGameResult
-
+  startMultiGame :: ProfileWithEmailPassword -> m StartMultiGameResult
+  startComputerGame :: ProfileWithEmailPassword -> m StartComputerGameResult
 

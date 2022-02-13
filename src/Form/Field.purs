@@ -19,7 +19,7 @@ import Type.Row as Row
 submit :: forall i p. String -> HH.HTML i p
 submit buttonText =
   HH.input
-    [ css "btn btn-lg btn-primary pull-xs-right"
+    [ css "btn btn-lg btn-primary-black pull-xs-right"
     , HP.type_ HP.InputSubmit
     , HP.value buttonText
     ]

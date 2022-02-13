@@ -1,6 +1,5 @@
 module Capability.Now where
 
-
 import Prelude
 
 import Control.Monad.Trans.Class (lift)

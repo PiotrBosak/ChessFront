@@ -33,8 +33,8 @@ routeCodec = root $ sum
   { "Home": noArgs
   , "Game": "game" / noArgs
   , "Board": "board" / noArgs
-  , "Register": "registers" /noArgs
-  , "Login": "login" /noArgs
+  , "Register": "registers" / noArgs
+  , "Login": "login" / noArgs
   }
 
 slug :: RouteDuplex' String -> RouteDuplex' Slug

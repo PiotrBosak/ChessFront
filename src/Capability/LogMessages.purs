@@ -8,6 +8,7 @@ import Data.Maybe (Maybe(..))
 import Halogen (HalogenM)
 
 import Prelude
+
 class Monad m <= LogMessages m where
   logMessage :: Log -> m Unit
 

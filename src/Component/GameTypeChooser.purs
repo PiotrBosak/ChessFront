@@ -17,10 +17,10 @@ import Data.Profile
 import Data.Route
 import Debug
 import Debug
+import Halogen.HTML.CSS
 import Logic.Domain
 import Logic.Domain
 import Logic.Game
-import Halogen.HTML.CSS
 import Prelude
 import Prelude
 import Utils
@@ -43,8 +43,6 @@ import Data.Maybe (Maybe(..), fromMaybe, isJust)
 import Data.Newtype as DN
 import Data.Newtype as DN
 import Data.Route as DR
-import Logic.Domain as D
-import Logic.Domain as D
 import Effect (Effect)
 import Effect (Effect)
 import Effect.Aff.Class (class MonadAff)
@@ -69,6 +67,8 @@ import Halogen.Store.Monad (class MonadStore)
 import Halogen.Store.Select (selectEq)
 import Halogen.Store.Select (selectEq)
 import Halogen.VDom.Driver (runUI)
+import Logic.Domain as D
+import Logic.Domain as D
 import MapUtils as MU
 import MapUtils as MU
 import Routing.Duplex as RD
@@ -107,8 +107,10 @@ render _ =
         [ B.board
         , HH.div
             [ css "lobby gtc-grid" ]
-            [ HH.button [ (HE.onClick \_ -> TenMinute), css "gtc-box" ] [ HH.text " minutes aaaa" ]
-            , HH.button [ HE.onClick \_ -> TwentyMinute, css "gtc-box" ] [ HH.text "20 aaa" ]
+            [ HH.button [ (HE.onClick \_ -> TenMinute), css "gtc-box" ] [ HH.text " minutes" ]
+            , HH.button [ HE.onClick \_ -> FiveMinute, css "gtc-box" ] [ HH.text "5 minutes" ]
+            , HH.button [ HE.onClick \_ -> FiveMinute, css "gtc-box" ] [ HH.text "5 minutes" ]
+            , HH.button [ HE.onClick \_ -> FiveMinute, css "gtc-box" ] [ HH.text "5 minutes" ]
             , HH.button [ HE.onClick \_ -> FiveMinute, css "gtc-box" ] [ HH.text "5 minutes" ]
             , HH.button [ HE.onClick \_ -> OneMinute, css "gtc-box" ] [ HH.text "1 minute" ]
             ]

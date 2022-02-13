@@ -16,6 +16,7 @@ derive instance ordUsername :: Ord Username
 
 codec :: JsonCodec Username
 codec = wrapIso Username CA.string
+
 parse :: String -> Maybe Username
 parse "" = Nothing
 parse str = Just (Username str)

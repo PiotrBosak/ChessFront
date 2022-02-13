@@ -1,29 +1,24 @@
 module Component.Router where
 
-import Prelude
-import Debug
-import Capability.Navigate
+import Capability.Navigate (class Navigate)
+import Capability.User (class ManageUser)
+import Component.BoardComponent (boardComponent)
+import Component.HomePage (Output, homeComponent)
+import Data.Maybe (Maybe(..))
+import Data.Profile (Profile)
+import Data.Route (Route(..))
+import Debug (trace)
+import Prelude (Unit, Void, bind, discard, pure, show, unit, ($))
 import Component.GameTypeChooser as GTC
-import Capability.User
-import Data.Either (hush)
-import Page.Login as Login
-import Halogen.HTML.Events as HE
-import Data.Foldable (elem)
-import Data.Maybe (Maybe(..), fromMaybe, isJust)
 import Effect.Aff.Class (class MonadAff)
 import Halogen as H
 import Halogen.HTML as HH
-import Halogen.Store.Connect (Connected, connect)
+import Halogen.Store.Connect (Connected)
 import Halogen.Store.Monad (class MonadStore)
-import Component.BoardComponent
-import Halogen.Store.Select (selectEq)
-import Routing.Duplex as RD
-import Routing.Hash (getHash)
+import Page.Login as Login
+import Page.Register as Register
+import Store as Store
 import Type.Proxy (Proxy(..))
-import Data.Route
-import Data.Profile
-import Data.Maybe
-import Component.HomePage
 
 data Query a = Navigate Route a
 type State =
@@ -48,18 +43,21 @@ type ChildSlots =
   , register :: OpaqueSlot Unit Unit
   )
 
+initialState :: forall input. input -> State
 initialState _ =
   { route: Nothing
   , currentUser: Nothing
   }
 
-render ::
-    forall m. MonadAff m
-     => ManageUser m
-     => Navigate m
-     => State
-     -> H.ComponentHTML Action ChildSlots m
-render { route, currentUser } = case route of
+render
+  :: forall m
+   . MonadAff m
+  => ManageUser m
+  => Navigate m
+  => MonadStore Store.Action Store.Store m
+  => State
+  -> H.ComponentHTML Action ChildSlots m
+render { route } = case route of
   Nothing ->
     HH.slot (Proxy :: _ "home") unit homeComponent unit HandleButton
   Just Board ->
@@ -69,15 +67,16 @@ render { route, currentUser } = case route of
   Just Game ->
     HH.slot_ (Proxy :: _ "game") unit (trace "plumbulka" \_ -> boardComponent) unit
   Just Login ->
-    HH.slot_ (Proxy :: _ "login") unit Login.component {redirect: false }
+    HH.slot_ (Proxy :: _ "login") unit Login.component { redirect: false }
   Just Register ->
-    HH.slot (Proxy :: _ "home") unit homeComponent unit HandleButton
+    HH.slot_ (Proxy :: _ "register") unit Register.component unit
 
 routerComponent
   :: forall m
    . MonadAff m
   => Navigate m
   => ManageUser m
+  => MonadStore Store.Action Store.Store m
   => H.Component Query Unit Void m
 routerComponent =
   H.mkComponent

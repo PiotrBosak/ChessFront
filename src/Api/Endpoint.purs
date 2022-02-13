@@ -1,4 +1,5 @@
 module Api.Endpoint where
+
 import Prelude hiding ((/))
 
 import Data.Route (slug, uname)
@@ -24,7 +25,6 @@ type PaginationRep =
 
 type Pagination = { | PaginationRep }
 
-
 type ArticleParams =
   { tag :: Maybe String
   , author :: Maybe Username
@@ -43,6 +43,7 @@ data Endpoint
   = Login
   | User
   | Users
+
 derive instance genericEndpoint :: Generic Endpoint _
 
 -- Our codec will cause a compile-time error if we fail to handle any of our
@@ -57,8 +58,8 @@ derive instance genericEndpoint :: Generic Endpoint _
 -- | produce valid paths, see the `routing-duplex` tutorial:
 -- | https://github.com/natefaubion/purescript-routing-duplex/tree/v0.2.0
 endpointCodec :: RouteDuplex' Endpoint
-endpointCodec = root $ prefix "api" $ sum
-  { "Login": "users" / "login" / noArgs
+endpointCodec = root $ prefix "v1" $ sum
+  { "Login": "auth" / "login" / noArgs
   , "User": "user" / noArgs
-  , "Users": "users" / noArgs
+  , "Users": "auth" / "users" / noArgs
   }

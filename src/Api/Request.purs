@@ -99,14 +99,14 @@ registerCodec =
     }
 
 type LoginFields =
-  { email :: Email
+  { username :: String
   , password :: String
   }
 
 loginCodec :: JsonCodec LoginFields
 loginCodec =
   CAR.object "LoginFields"
-    { email: Email.codec
+    { username: CA.string
     , password: CA.string
     }
 
@@ -115,7 +115,7 @@ loginCodec =
 login :: forall m. MonadAff m => BaseURL -> LoginFields -> m (Either String (Tuple Token Profile))
 login baseUrl fields =
   let
-    method = Post $ Just $ Codec.encode (CAR.object "User" { user: loginCodec }) { user: fields }
+    method = Post $ Just $ Codec.encode loginCodec fields
   in
     requestUser baseUrl { endpoint: Login, method }
 
@@ -124,7 +124,7 @@ login baseUrl fields =
 register :: forall m. MonadAff m => BaseURL -> RegisterFields -> m (Either String (Tuple Token Profile))
 register baseUrl fields =
   let
-    method = Post $ Just $ Codec.encode (CAR.object "User" { user: registerCodec }) { user: fields }
+    method = Post $ Just $ Codec.encode registerCodec fields
   in
     requestUser baseUrl { endpoint: Users, method }
 

@@ -6,6 +6,7 @@ import Data.DateTime (DateTime)
 import Data.Either (either)
 import Data.Foldable (fold)
 import Data.Formatter.DateTime (formatDateTime)
+
 data LogReason = Debug | Info | Warn | Error
 
 derive instance eqLogReason :: Eq LogReason
@@ -17,6 +18,7 @@ newtype Log = Log
   }
 
 derive instance eqLog :: Eq Log
+
 message :: Log -> String
 message (Log { message: m }) = m
 
@@ -31,7 +33,6 @@ mkLog logReason inputMessage = do
   let
     headerWith start =
       fold [ "[", start, ": ", formatTimestamp now, "]\n", inputMessage ]
-
 
     formattedLog = headerWith case logReason of
       Debug -> "DEBUG"

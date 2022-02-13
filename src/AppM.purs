@@ -50,6 +50,7 @@ instance nowAppM :: Now AppM where
   nowDate = liftEffect Now.nowDate
   nowTime = liftEffect Now.nowTime
   nowDateTime = liftEffect Now.nowDateTime
+
 instance logMessagesAppM :: LogMessages AppM where
   logMessage log = do
     { logLevel } <- getStore

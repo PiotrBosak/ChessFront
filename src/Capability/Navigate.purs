@@ -6,9 +6,8 @@ import Halogen (HalogenM)
 import Prelude
 
 class Monad m <= Navigate m where
-    navigate :: Route -> m Unit
-    logout :: m Unit
-
+  navigate :: Route -> m Unit
+  logout :: m Unit
 
 instance navigateHalogenM :: Navigate m => Navigate (HalogenM st act slots msg m) where
   navigate = lift <<< navigate
