@@ -25,32 +25,53 @@ errorToString = case _ of
   InvalidEmail -> "Invalid email address"
   InvalidUsername -> "Invalid username"
 
-required :: forall form m a. Eq a => Monoid a => Monad m => F.Validation form m FormError a a
-required = F.hoistFnE_ $ cond (_ /= mempty) Required
+required :: forall a. Eq a => Monoid a => a -> Either FormError a
+required = check (_ /= mempty) Required
 
-minLength :: forall form m. Monad m => Int -> F.Validation form m FormError String String
-minLength min = F.hoistFnE_ $ cond (\s -> String.length s >= min) TooShort
+-- | Ensure that an input string is longer than the provided lower limit.
+minLength :: Int -> String -> Either FormError String
+minLength n = check (\str -> String.length str > n) TooShort
 
-maxLength :: forall form m. Monad m => Int -> F.Validation form m FormError String String
-maxLength n = F.hoistFnE_ $ cond (\str -> String.length str <= n) TooLong
+-- | Ensure that an input string is shorter than the provided upper limit.
+maxLength :: Int -> String -> Either FormError String
+maxLength n = check (\str -> String.length str <= n) TooLong
 
-emailFormat :: forall form m. Monad m => F.Validation form m FormError String Email
-emailFormat = F.hoistFnE_ $ map Email <<< cond (String.contains (String.Pattern "@")) InvalidEmail
+-- | Ensure that an input string is a valid email address, using a fairly naive
+-- | requirement that it at least includes the `@` symbol.
+emailFormat :: String -> Either FormError Email
+emailFormat = map Email <<< check (String.contains (String.Pattern "@")) InvalidEmail
 
-usernameFormat :: forall form m. Monad m => F.Validation form m FormError String Username
-usernameFormat = F.hoistFnE_ $ note InvalidUsername <<< Username.parse
+-- | Ensure that an input string is a valid username. Usernames in Conduit use
+-- | the smart constructor pattern, so we can't construct a username directly --
+-- | we'll need to defer to the `parse` helper function exported by
+-- | `Conduit.Data.Username`. Since that function returns a `Maybe` value, we'll
+-- | use the `note` helper from `Data.Either` to turn the `Nothing` case into
+-- | an error.
+usernameFormat :: String -> Either FormError Username
+usernameFormat = note InvalidUsername <<< Username.parse
 
-cond :: forall a. (a -> Boolean) -> FormError -> a -> Either FormError a
-cond f err a = if f a then pure a else Left err
+-- | A small helper function for writing validation functions that rely on a
+-- | true/false predicate.
+check :: forall a. (a -> Boolean) -> FormError -> a -> Either FormError a
+check f err a
+  | f a = Right a
+  | otherwise = Left err
 
+-- | Sometimes we'd like to validate an input only if it isn't empty. This is useful for optional
+-- | fields: if you've provided a value, we'll validate it, but if you haven't, then you should
+-- | still be able to submit the form without error. For instance, we might allow a user to
+-- | optionally provide an email address, but if they do, it must be valid.
+-- |
+-- | This helper function lets us transform a set of validation rules so that they only apply when
+-- | the input is not empty. It isn't used in this module, but is used in the various forms.
 toOptional
-  :: forall form m a b
+  :: forall a b
    . Monoid a
   => Eq a
-  => Monad m
-  => F.Validation form m FormError a b
-  -> F.Validation form m FormError a (Maybe b)
-toOptional v = F.Validation \form val ->
-  case val == mempty of
-    true -> pure (pure Nothing)
-    false -> (map <<< map) Just (F.runValidation v form val)
+  => (a -> Either FormError b)
+  -> (a -> Either FormError (Maybe b))
+toOptional k = \value ->
+  if value == mempty then
+    Right Nothing
+  else
+    map Just $ k value

@@ -38,6 +38,7 @@ main = HA.runHalogenAff do
   rootComponent <- runAppM initialStore Router.routerComponent
   halogenIO <- runUI rootComponent unit body
   void $ liftEffect $ matchesWith (parse routeCodec) \old new ->
-    when (old /= Just new) do
-      launchAff_ $ halogenIO.query $ H.mkTell $ Router.Navigate new
+    when (old /= Just new) $ launchAff_ do
+      _response <- halogenIO.query $ H.mkTell $ Router.Navigate new
+      pure unit
 

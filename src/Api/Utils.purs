@@ -1,6 +1,6 @@
 module Api.Utils where
 
-import Affjax (request)
+import Affjax.Web (request)
 import Api.Request (BaseURL, RequestOptions, Token, defaultRequest, readToken, writeToken)
 import Capability.LogMessages (class LogMessages, logError)
 import Capability.Now (class Now)

@@ -2,8 +2,6 @@ module Page.Register where
 
 import Prelude
 import Api.Request (RegisterFields)
-import Capability.Navigate (class Navigate, navigate)
-import Capability.User
 import Component.HTML.Header (header)
 import Component.HTML.Utils (css, safeHref)
 import Data.Email (Email)
@@ -23,43 +21,106 @@ import Halogen.HTML.Properties as HP
 import Type.Proxy (Proxy(..))
 import Web.Event.Event as Event
 
-newtype RegisterForm (r :: Row Type -> Type) f = RegisterForm
-  ( r
-      ( username :: f V.FormError String Username
-      , email :: f V.FormError String Email
-      , password :: f V.FormError String String
-      )
+import Capability.Navigate (class Navigate, navigate)
+import Capability.User
+import Component.HTML.Header (header)
+import Component.HTML.Utils (css, safeHref)
+import Data.Email (Email)
+import Data.Route (Route(..))
+import Data.Username (Username)
+import Form.Field as Field
+import Form.Validation (FormError)
+import Form.Validation as V
+import Data.Foldable (traverse_)
+import Data.Maybe (Maybe(..))
+import Effect.Aff.Class (class MonadAff)
+import Formless as F
+import Halogen as H
+import Halogen.HTML as HH
+import Halogen.HTML.Events as HE
+import Halogen.HTML.Properties as HP
+
+-- | See the Formless tutorial to learn how to build your own forms:
+-- | https://github.com/thomashoneyman/purescript-halogen-formless
+
+type Form :: (Type -> Type -> Type -> Type) -> Row Type
+type Form f =
+  ( username :: f String FormError Username
+  , email :: f String FormError Email
+  , password :: f String FormError String
   )
 
-derive instance newtypeRegisterForm :: Newtype (RegisterForm r f) _
+type FormContext = F.FormContext (Form F.FieldState) (Form (F.FieldAction Action)) Unit Action
+type FormlessAction = F.FormlessAction (Form F.FieldState)
 
-data Action = HandleRegisterForm RegisterFields
+data Action
+  = Receive FormContext
+  | Eval FormlessAction
 
 component
-  :: forall q o m
+  :: forall query output m
    . MonadAff m
   => ManageUser m
   => Navigate m
-  => H.Component q Unit o m
-component = H.mkComponent
-  { initialState: const unit
+  => H.Component query Unit output m
+component = F.formless { liftAction: Eval } mempty $ H.mkComponent
+  { initialState: \context -> context
   , render
-  , eval: H.mkEval H.defaultEval { handleAction = handleAction }
+  , eval: H.mkEval $ H.defaultEval
+      { receive = Just <<< Receive
+      , handleAction = handleAction
+      , handleQuery = handleQuery
+      }
   }
-
   where
-  render _ =
+  handleAction :: Action -> H.HalogenM _ _ _ _ _ Unit
+  handleAction = case _ of
+    Receive context -> H.put context
+    Eval action -> F.eval action
+
+  handleQuery :: forall a. F.FormQuery _ _ _ _ a -> H.HalogenM _ _ _ _ _ (Maybe a)
+  handleQuery = do
+    let
+      onSubmit = registerUser >=> traverse_ (\_ -> navigate Home)
+      validation =
+        { username: V.required >=> V.usernameFormat
+        , email: V.required >=> V.minLength 3 >=> V.emailFormat
+        , password: V.required >=> V.minLength 8 >=> V.maxLength 20
+        }
+
+    F.handleSubmitValidate onSubmit F.validate validation
+
+  render :: FormContext -> H.ComponentHTML Action () m
+  render { formActions, fields, actions } =
     container
       [ HH.h1
           [ css "text-xs-center" ]
-          [ HH.text "Sign up" ]
+          [ HH.text "Sign Up" ]
       , HH.p
           [ css "text-xs-center" ]
           [ HH.a
               [ safeHref Login ]
-              [ HH.text "Already have an account? " ]
+              [ HH.text "Already have an account?" ]
           ]
-      , HH.slot F._formless unit formComponent unit HandleRegisterForm
+      , HH.form
+          [ HE.onSubmit formActions.handleSubmit ]
+          [ HH.fieldset_
+              [ Field.textInput
+                  { state: fields.username, action: actions.username }
+                  [ HP.placeholder "Username" ]
+              , Field.textInput
+                  { state: fields.email, action: actions.email }
+                  [ HP.placeholder "Email"
+                  , HP.type_ HP.InputEmail
+                  ]
+              , Field.textInput
+                  { state: fields.password, action: actions.password }
+                  [ HP.placeholder "Password "
+                  , HP.type_ HP.InputPassword
+                  ]
+              , Field.submitButton "Sign up"
+              ]
+          ]
       ]
     where
     container html =
@@ -68,64 +129,13 @@ component = H.mkComponent
         , HH.div
             [ css "auth-page" ]
             [ HH.div
-                [ css "col-md-6 offset-md-3 col-xs12" ]
-                html
+                [ css "container page" ]
+                [ HH.div
+                    [ css "row" ]
+                    [ HH.div
+                        [ css "col-md-6 offset-md-3 col-xs12" ]
+                        html
+                    ]
+                ]
             ]
         ]
-
-  handleAction :: forall state output slots. Action -> H.HalogenM state Action slots output m Unit
-  handleAction = case _ of
-    HandleRegisterForm fields ->
-      registerUser fields >>= traverse_ (\_ -> navigate Home)
-
-data FormAction = Submit Event.Event
-
-formComponent
-  :: forall formQuery formSlots formInput m
-   . MonadAff m
-  => F.Component RegisterForm formQuery formSlots formInput RegisterFields m
-formComponent = F.component formInput $ F.defaultSpec
-  { render = renderForm
-  , handleEvent = handleEvent
-  , handleAction = handleAction
-  }
-  where
-  formInput _ =
-    { validators: RegisterForm
-        { username: V.required >>> V.usernameFormat
-        , email: V.required >>> V.minLength 3 >>> V.emailFormat
-        , password: V.required >>> V.minLength 8 >>> V.maxLength 20
-        }
-    , initialInputs: Nothing
-    }
-
-  handleEvent = F.raiseResult
-  handleAction = case _ of
-    Submit event -> do
-      H.liftEffect $ Event.preventDefault event
-      eval F.submit
-    where
-    eval act = F.handleAction handleAction handleEvent act
-
-  renderForm { form } =
-    HH.form
-      [ HE.onSubmit \ev -> F.injAction $ Submit ev ]
-      [ HH.fieldset_
-          [ username
-          , email
-          , password
-          ]
-      , Field.submit "Sign up"
-      ]
-    where
-    username =
-      Field.input (Proxy :: Proxy "username") form
-        [ HP.placeholder "Username", HP.type_ HP.InputText ]
-
-    email =
-      Field.input (Proxy :: Proxy "email") form
-        [ HP.placeholder "Email", HP.type_ HP.InputEmail ]
-
-    password =
-      Field.input (Proxy :: Proxy "password") form
-        [ HP.placeholder "Password", HP.type_ HP.InputPassword ]

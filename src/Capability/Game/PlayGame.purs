@@ -1,10 +1,10 @@
 module Capability.Game.PlayGame where
 
-import Data.GameActionResult
-import Data.GameData
-import Data.GameActions
-import Data.PlayerData
 import Prelude
+import Data.GameActionResult (DrawProposalAnswerResult, FortfeitResult, MakeMoveResult, ProposeDrawResult)
+import Data.GameActions (DrawProposal, DrawProposalAnswer, Fortfeit, MakeMove)
+import Data.GameData (GameData)
+
 
 class Monad m <= PlayGame m where
   move :: MakeMove -> GameData -> m MakeMoveResult

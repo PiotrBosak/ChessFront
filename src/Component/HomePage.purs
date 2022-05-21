@@ -1,4 +1,4 @@
-module Component.HomePage where
+module Component.HomePage(homeComponent, Output) where
 
 import Prelude
 import Halogen.HTML.Events as HE
@@ -19,7 +19,7 @@ import Data.Profile (Profile)
 
 data Action
   = MoveToGame
-  | HandleOutput GTC.Output
+  | HandleOutput GTC.Action
 
 type State =
   { currentUser :: Maybe Profile }
@@ -27,18 +27,16 @@ type State =
 data Output = Clicked
 
 type ChildSlots =
-  (gameChooser :: forall query. H.Slot query GTC.Output Unit)
+  (gameChooser :: forall query. H.Slot query GTC.Action Unit)
 
 _gameChooser = Proxy :: Proxy "gameChooser"
 
-homeComponent
-  :: forall q o m. MonadAff m => MonadStore Store.Action Store.Store m => H.Component q Unit Output m
+homeComponent :: forall q m. MonadAff m => MonadStore Store.Action Store.Store m => H.Component q Unit Output m
 homeComponent = connect (selectEq _.currentUser) $ H.mkComponent
   { initialState
   , render
   , eval: H.mkEval $ H.defaultEval { handleAction = handleAction }
   }
-
 initialState { context: currentUser } = { currentUser: currentUser }
 
 handleAction :: forall slots o m. MonadAff m => Action -> H.HalogenM State Action slots Output m Unit

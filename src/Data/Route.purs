@@ -17,6 +17,7 @@ data Route
   | Board
   | Register
   | Login
+  | WaitForGame
 
 derive instance genericRoute :: Generic Route _
 derive instance eqRoute :: Eq Route
@@ -27,6 +28,7 @@ instance showRoute :: Show Route where
   show Board = "board"
   show Register = "register"
   show Login = "login"
+  show WaitForGame = "waitForGame"
 
 routeCodec :: RouteDuplex' Route
 routeCodec = root $ sum
@@ -35,6 +37,7 @@ routeCodec = root $ sum
   , "Board": "board" / noArgs
   , "Register": "registers" / noArgs
   , "Login": "login" / noArgs
+  , "WaitForGame": "waitForGame" / noArgs
   }
 
 slug :: RouteDuplex' String -> RouteDuplex' Slug

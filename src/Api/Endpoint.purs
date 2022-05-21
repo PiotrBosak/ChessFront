@@ -2,16 +2,12 @@ module Api.Endpoint where
 
 import Prelude hiding ((/))
 
-import Data.Route (slug, uname)
-import Data.Profile
-import Data.Username
 import Data.Generic.Rep (class Generic)
-import Data.Lens.Iso.Newtype (_Newtype)
-import Data.Maybe (Maybe(..))
-import Routing.Duplex (RouteDuplex', int, optional, prefix, root, segment, string)
+import Data.Maybe (Maybe)
+import Data.Username (Username)
+import Routing.Duplex (RouteDuplex', prefix, root)
 import Routing.Duplex.Generic (noArgs, sum)
-import Routing.Duplex.Generic.Syntax ((/), (?))
-import Slug (Slug)
+import Routing.Duplex.Generic.Syntax ((/))
 
 -- | First, let's define a few types necessary for our larger `Endpoint` type.
 
@@ -43,6 +39,8 @@ data Endpoint
   = Login
   | User
   | Users
+  | StartMultiGame
+  | PollGame
 
 derive instance genericEndpoint :: Generic Endpoint _
 
@@ -62,4 +60,6 @@ endpointCodec = root $ prefix "v1" $ sum
   { "Login": "auth" / "login" / noArgs
   , "User": "user" / noArgs
   , "Users": "auth" / "users" / noArgs
+  , "StartMultiGame": "gameSearch" / "start" / noArgs
+  , "PollGame": "gameSearch" / "poll" / noArgs
   }

@@ -3,6 +3,7 @@
 , dependencies =
   [ "aff"
   , "affjax"
+  , "affjax-web"
   , "argonaut"
   , "argonaut-codecs"
   , "argonaut-core"
@@ -27,6 +28,7 @@
   , "halogen-css"
   , "halogen-formless"
   , "halogen-store"
+  , "halogen-subscriptions"
   , "http-methods"
   , "integers"
   , "lists"
@@ -46,6 +48,7 @@
   , "safe-coerce"
   , "slug"
   , "strings"
+  , "tailrec"
   , "transformers"
   , "tuples"
   , "typelevel-prelude"

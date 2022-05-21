@@ -23,7 +23,6 @@ data Action
 
 -- | Finally, we'll map this action to a state update in a function called a
 -- | 'reducer'. If you're curious to learn more, see the `halogen-store`
--- | documentation!
 reduce :: Store -> Action -> Store
 reduce store = case _ of
   LoginUser profile ->

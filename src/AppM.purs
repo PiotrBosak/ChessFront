@@ -1,24 +1,23 @@
 module AppM where
 
-import Prelude
-import Api.Endpoint (Endpoint(..))
-import Api.Request (RequestMethod(..))
-import Data.Log as Log
-import Api.Request as Request
-import Capability.User
-import Capability.Now
-import Api.Utils (authenticate, decode, decodeWithUser, mkAuthRequest, mkRequest)
-import Capability.LogMessages (class LogMessages)
-import Capability.Navigate (class Navigate, navigate)
+import Capability.Game.StartGame (class StartGame)
+import Data.Maybe
+import Debug
+import Capability.Game.PollGame
 import Capability.Now (class Now)
-import Data.Profile as Profile
-import Data.Route as Route
-import Store (Action(..), LogLevel(..), Store)
-import Store as Store
+import Api.Endpoint
 import Data.Codec.Argonaut as CA
 import Data.Codec.Argonaut as Codec
 import Data.Codec.Argonaut.Record as CAR
-import Data.Maybe (Maybe(..))
+import Capability.User (class ManageUser)
+import Data.StartGameResult (StartComputerGameResult(..), StartMultiGameResult(..))
+import Prelude (class Applicative, class Apply, class Bind, class Functor, class Monad, bind, discard, pure, unit, ($), (<<<))
+import Api.Request
+import Api.Utils
+import Capability.LogMessages (class LogMessages)
+import Capability.Navigate (class Navigate, navigate)
+import Data.Log as Log
+import Data.Route as Route
 import Effect.Aff (Aff)
 import Effect.Aff.Class (class MonadAff)
 import Effect.Class (class MonadEffect, liftEffect)
@@ -29,6 +28,8 @@ import Halogen.Store.Monad (class MonadStore, StoreT, getStore, runStoreT, updat
 import Routing.Duplex (print)
 import Routing.Hash (setHash)
 import Safe.Coerce (coerce)
+import Store (Action(..), LogLevel(..), Store)
+import Store as Store
 
 newtype AppM a = AppM (StoreT Store.Action Store.Store Aff a)
 
@@ -44,7 +45,6 @@ derive newtype instance monadAppM :: Monad AppM
 derive newtype instance monadEffectAppM :: MonadEffect AppM
 derive newtype instance monadAffAppM :: MonadAff AppM
 derive newtype instance monadStoreAppM :: MonadStore Action Store AppM
-
 instance nowAppM :: Now AppM where
   now = liftEffect Now.now
   nowDate = liftEffect Now.nowDate
@@ -60,21 +60,32 @@ instance logMessagesAppM :: LogMessages AppM where
 
 instance manageUserAppM :: ManageUser AppM where
   loginUser =
-    authenticate Request.login
+    authenticate login
 
   registerUser =
-    authenticate Request.register
+    authenticate register
 
 instance navigateAppM :: Navigate AppM where
   navigate =
     liftEffect <<< setHash <<< print Route.routeCodec
 
   logout = do
-    liftEffect $ Request.removeToken
+    liftEffect $ removeToken
     updateStore LogoutUser
     navigate Route.Home
 
---  getCurrentUser = do
---    mbJson <- mkAuthRequest { endpoint: User, method: Get }
---    map (map _.user)
---      $ decode (CAR.object "User" { user: Profile.profileWithEmailCodec }) mbJson-    getCurrentUser :: m (Maybe ProfileWithEmail)
+instance startGameAppM :: StartGame AppM where
+    startComputerGame = pure StartComputerGameResult
+    startMultiGame = do
+       let
+         method = Post $ Nothing
+       mbJson <- mkAuthRequest { endpoint: StartMultiGame, method }
+       pure StartMultiGameResult
+
+instance pollGameAppM :: PollGame AppM where
+    pollGame = do
+        let
+            method = Post $ Nothing
+        mbJson <- mkAuthRequest { endpoint: PollGame, method }
+        result <- decode pollGameResultCodec mbJson
+        trace "Hello, looking for game" \_ -> pure $ maybe GameNotFound (\x -> x) result

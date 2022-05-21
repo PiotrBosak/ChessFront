@@ -14,17 +14,12 @@ module Api.Request
   ) where
 
 import Prelude
-
-import Affjax (Request, printError, request)
+import Data.Username (Username, codec)
+import Affjax.Web (Request, printError, request)
 import Affjax.RequestBody as RB
 import Affjax.RequestHeader (RequestHeader(..))
 import Affjax.ResponseFormat as RF
 import Api.Endpoint (Endpoint(..), endpointCodec)
-import Data.Email (Email)
-import Data.Email as Email
-import Data.Profile (Profile)
-import Data.Profile as Profile
-import Data.Username
 import Data.Argonaut.Core (Json)
 import Data.Bifunctor (lmap)
 import Data.Codec as Codec
@@ -32,8 +27,12 @@ import Data.Codec.Argonaut (JsonCodec, JsonDecodeError, printJsonDecodeError)
 import Data.Codec.Argonaut as CA
 import Data.Codec.Argonaut.Record as CAR
 import Data.Either (Either(..))
+import Data.Email (Email)
+import Data.Email as Email
 import Data.HTTP.Method (Method(..))
 import Data.Maybe (Maybe(..))
+import Data.Profile (Profile)
+import Data.Profile as Profile
 import Data.Tuple (Tuple(..))
 import Effect (Effect)
 import Effect.Aff.Class (class MonadAff, liftAff)
@@ -69,7 +68,7 @@ defaultRequest (BaseURL baseUrl) auth { endpoint, method } =
   , url: baseUrl <> print endpointCodec endpoint
   , headers: case auth of
       Nothing -> []
-      Just (Token t) -> [ RequestHeader "Authorization" $ "Token " <> t ]
+      Just (Token t) -> [ RequestHeader "Authorization" $ "Bearer " <> t ]
   , content: RB.json <$> body
   , username: Nothing
   , password: Nothing
@@ -119,8 +118,7 @@ login baseUrl fields =
   in
     requestUser baseUrl { endpoint: Login, method }
 
--- | This function registers a user (if they don't already exist), returning an auth token and the
--- | user's minimal profile.
+
 register :: forall m. MonadAff m => BaseURL -> RegisterFields -> m (Either String (Tuple Token Profile))
 register baseUrl fields =
   let
@@ -128,8 +126,6 @@ register baseUrl fields =
   in
     requestUser baseUrl { endpoint: Users, method }
 
--- | The login and registration requests share the same underlying implementation, just a different
--- | endpoint. This function can be re-used by both requests.
 requestUser :: forall m. MonadAff m => BaseURL -> RequestOptions -> m (Either String (Tuple Token Profile))
 requestUser baseUrl opts = do
   res <- liftAff $ request $ defaultRequest baseUrl Nothing opts

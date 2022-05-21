@@ -1,8 +1,6 @@
 module Component.HTML.Board where
 
 import BoardFactory
-import CSS.Common (auto)
-
 import Component.HTML.Header
 import Conduit.Component.HTML.Footer
 import Control.Plus
@@ -22,6 +20,7 @@ import Utils
 import Affjax as AX
 import Affjax.ResponseFormat as AXRF
 import CSS as C
+import CSS.Common (auto)
 import Component.HTML.Utils (css, maybeElem, safeHref, whenElem)
 import Data.Either (hush)
 import Data.Foldable (elem)

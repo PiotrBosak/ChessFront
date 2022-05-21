@@ -7,7 +7,7 @@ import Debug
 import Data.Maybe
 import Data.Array
 import Data.Newtype (wrap, unwrap)
-import Control.MonadZero (guard)
+import Control.Alternative (guard)
 import Prelude
 
 moves :: Board -> Position -> Array { position :: Position, moveType :: MoveType }
