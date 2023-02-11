@@ -10,6 +10,11 @@ type MakeMove =
   , to :: Position
   }
 
+type ReceiveMove =
+  { from :: Position
+  , to :: Position
+  }
+
 type DrawProposal =
   { playerData :: PlayerData }
 

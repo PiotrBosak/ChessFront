@@ -14,32 +14,33 @@ module Api.Request
   ) where
 
 import Prelude
-import Data.Username (Username, codec)
-import Affjax.Web (Request, printError, request)
-import Affjax.RequestBody as RB
+
 import Affjax.RequestHeader (RequestHeader(..))
-import Affjax.ResponseFormat as RF
+import Affjax.Web (Request, printError, request)
 import Api.Endpoint (Endpoint(..), endpointCodec)
 import Data.Argonaut.Core (Json)
 import Data.Bifunctor (lmap)
-import Data.Codec as Codec
 import Data.Codec.Argonaut (JsonCodec, JsonDecodeError, printJsonDecodeError)
-import Data.Codec.Argonaut as CA
-import Data.Codec.Argonaut.Record as CAR
 import Data.Either (Either(..))
 import Data.Email (Email)
-import Data.Email as Email
 import Data.HTTP.Method (Method(..))
 import Data.Maybe (Maybe(..))
 import Data.Profile (Profile)
-import Data.Profile as Profile
 import Data.Tuple (Tuple(..))
+import Data.Username (Username, codec)
 import Effect (Effect)
 import Effect.Aff.Class (class MonadAff, liftAff)
 import Routing.Duplex (print)
 import Web.HTML (window)
 import Web.HTML.Window (localStorage)
 import Web.Storage.Storage (getItem, removeItem, setItem)
+import Data.Codec.Argonaut as CA
+import Data.Codec.Argonaut.Record as CAR
+import Data.Codec as Codec
+import Data.Email as Email
+import Data.Profile as Profile
+import Affjax.RequestBody as RB
+import Affjax.ResponseFormat as RF
 
 newtype Token = Token String
 
@@ -114,7 +115,7 @@ loginCodec =
 login :: forall m. MonadAff m => BaseURL -> LoginFields -> m (Either String (Tuple Token Profile))
 login baseUrl fields =
   let
-    method = Post $ Just $ Codec.encode loginCodec fields
+      method = Post $ Just $ Codec.encode loginCodec fields
   in
     requestUser baseUrl { endpoint: Login, method }
 
@@ -160,5 +161,4 @@ writeToken (Token str) =
   setItem tokenKey str =<< localStorage =<< window
 
 removeToken :: Effect Unit
-removeToken =
-  removeItem tokenKey =<< localStorage =<< window
+removeToken = removeItem tokenKey =<< localStorage =<< window

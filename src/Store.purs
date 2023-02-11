@@ -12,6 +12,7 @@ derive instance eqLogLevl :: Eq LogLevel
 derive instance orgLogLevl :: Ord LogLevel
 
 type Store =
+    -- tutaj chyba można dodać ten socket manager albo avar socket manager
   { logLevel :: LogLevel
   , baseUrl :: BaseURL
   , currentUser :: Maybe Profile

@@ -8,6 +8,7 @@
   , "argonaut-codecs"
   , "argonaut-core"
   , "arrays"
+  , "avar"
   , "bifunctors"
   , "codec"
   , "codec-argonaut"
@@ -55,6 +56,7 @@
   , "variant"
   , "web-events"
   , "web-html"
+  , "web-socket"
   , "web-storage"
   , "web-uievents"
   ]

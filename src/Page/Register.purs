@@ -48,6 +48,7 @@ type Form f =
   ( username :: f String FormError Username
   , email :: f String FormError Email
   , password :: f String FormError String
+
   )
 
 type FormContext = F.FormContext (Form F.FieldState) (Form (F.FieldAction Action)) Unit Action

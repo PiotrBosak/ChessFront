@@ -3,7 +3,6 @@ module Component.Router where
 import Capability.Navigate (class Navigate)
 import Capability.User (class ManageUser)
 import Data.Functor
-import Capability.Game.PollGame
 import Capability.Game.StartGame
 import Component.BoardComponent (boardComponent)
 import Component.WaitForGameComponent as WFGC
@@ -59,7 +58,7 @@ render
    . MonadAff m
   => ManageUser m
   => Navigate m
-  => PollGame m
+  => StartGame m
   => MonadStore Store.Action Store.Store m
   => State
   -> H.ComponentHTML Action ChildSlots m
@@ -84,7 +83,6 @@ routerComponent
    . MonadAff m
   => Navigate m
   => StartGame m
-  => PollGame m
   => ManageUser m
   => MonadStore Store.Action Store.Store m
   => H.Component Query Unit Void m

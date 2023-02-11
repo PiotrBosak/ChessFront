@@ -3,14 +3,13 @@ module AppM where
 import Capability.Game.StartGame (class StartGame)
 import Data.Maybe
 import Debug
-import Capability.Game.PollGame
 import Capability.Now (class Now)
 import Api.Endpoint
 import Data.Codec.Argonaut as CA
 import Data.Codec.Argonaut as Codec
 import Data.Codec.Argonaut.Record as CAR
 import Capability.User (class ManageUser)
-import Data.StartGameResult (StartComputerGameResult(..), StartMultiGameResult(..))
+import Data.StartGameResult (StartComputerGameResult(..), StartMultiGameResult(..), SearchForGameResult(..))
 import Prelude (class Applicative, class Apply, class Bind, class Functor, class Monad, bind, discard, pure, unit, ($), (<<<))
 import Api.Request
 import Api.Utils
@@ -30,6 +29,7 @@ import Routing.Hash (setHash)
 import Safe.Coerce (coerce)
 import Store (Action(..), LogLevel(..), Store)
 import Store as Store
+import Effect.AVar (new) as AVar
 
 newtype AppM a = AppM (StoreT Store.Action Store.Store Aff a)
 
@@ -76,16 +76,9 @@ instance navigateAppM :: Navigate AppM where
 
 instance startGameAppM :: StartGame AppM where
     startComputerGame = pure StartComputerGameResult
+    searchGame = pure GameNotFound
     startMultiGame = do
        let
          method = Post $ Nothing
        mbJson <- mkAuthRequest { endpoint: StartMultiGame, method }
        pure StartMultiGameResult
-
-instance pollGameAppM :: PollGame AppM where
-    pollGame = do
-        let
-            method = Post $ Nothing
-        mbJson <- mkAuthRequest { endpoint: PollGame, method }
-        result <- decode pollGameResultCodec mbJson
-        trace "Hello, looking for game" \_ -> pure $ maybe GameNotFound (\x -> x) result

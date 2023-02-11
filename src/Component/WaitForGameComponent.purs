@@ -20,24 +20,26 @@ import Halogen.Store.Connect
 import Halogen.Store.Select
 import Halogen as H
 import Store as Store
+import Capability.Game.StartGame
+import Data.StartGameResult (SearchForGameResult(..))
 import Halogen.HTML as HH
 import Halogen.HTML.Events as HE
 import Data.Route
-import Capability.Game.PollGame
 import Data.Profile
 import Data.Maybe
+import Capability.Game.StartGame (searchGame)
 
 type State =
   { currentUser :: Maybe Profile
   , sid :: Maybe SubscriptionId
   }
 
-data Action = Initialize | PollGame
+data Action = Initialize | StartSearching
 
 component :: forall query output m
     . MonadAff m
     => MonadStore Store.Action Store.Store m
-    => PollGame m
+    => StartGame m
     => H.Component query Unit output m
 component =
     connect (selectEq _.currentUser) $ H.mkComponent
@@ -59,13 +61,13 @@ render { currentUser: currentUser } =
         , footer
         ]
 
-handleAction :: forall output m. MonadAff m => PollGame m => Action -> H.HalogenM State Action () output m Unit
+handleAction :: forall output m. MonadAff m => StartGame m => Action -> H.HalogenM State Action () output m Unit
 handleAction action = case action of
     Initialize -> do
-        id <- H.subscribe =<< startPolling
+        id <- H.subscribe =<< startSearching
         H.modify_ _ { sid = Just id }
         pure unit
-    PollGame -> pollGame >>= \result -> case result of
+    StartSearching -> searchGame >>= \result -> case result of
         GameNotFound -> trace "still searching" \_ -> pure unit
         GameFound gameId -> do
             state <- H.get
@@ -74,10 +76,10 @@ handleAction action = case action of
             trace "Found!!!!" \_ -> maybe (pure unit) H.unsubscribe sid
             pure unit
 
-startPolling :: forall m a. MonadAff m => m (HS.Emitter Action)
-startPolling = do
+startSearching :: forall m a. MonadAff m => m (HS.Emitter Action)
+startSearching = do
     { emitter, listener } <- H.liftEffect HS.create
     _ <- H.liftAff $ Aff.forkAff $ forever do
-      H.liftEffect $ HS.notify listener PollGame
+      H.liftEffect $ HS.notify listener StartSearching
       Aff.delay $ Milliseconds 2000.0
     pure emitter
