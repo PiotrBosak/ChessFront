@@ -10,6 +10,7 @@ import Halogen.HTML.CSS as HC
 import Data.Route (Route(..))
 import Data.Maybe (Maybe, isNothing, isJust)
 import Data.Monoid (guard)
+import Control.Alternative (guard) as CA
 import Halogen.HTML as HH
 import Halogen.HTML.Properties as HP
 
@@ -26,13 +27,11 @@ header currentUser route =
             [ HH.text "Chess" ]
         , HH.ul
             [ css "nav navbar-nav pull-xs-right" ]
-            [ navItem Home
-                [ HH.text "Home" ]
-            , whenElem (isJust currentUser) \_ ->
+            [ whenElem (isJust currentUser) \_ ->
                 navItem Home
                   [ HH.i
-                      [ css "ion-compose" ]
-                      [ HH.text " New Post" ]
+                      [ css "ion-person-stalker" ]
+                      [ HH.text " Find Friends" ]
                   ]
             , whenElem (isJust currentUser) \_ ->
                 navItem Home
@@ -49,10 +48,10 @@ header currentUser route =
                   , HH.text $ ""
                   ]
             , whenElem (isNothing currentUser) \_ ->
-                navItem Game
+                navItem Login
                   [ HH.text "Log in" ]
             , whenElem (isNothing currentUser) \_ ->
-                navItem Game
+                navItem Register
                   [ HH.text "Sign up" ]
             ]
         ]

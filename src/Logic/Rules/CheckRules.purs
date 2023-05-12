@@ -1,7 +1,7 @@
 module CheckRules (isKingChecked) where
 
 import Logic.Domain
-import Control.MonadZero
+import Control.Alternative (guard)
 import Data.Maybe as MA
 import Data.Tuple
 import Rules as R

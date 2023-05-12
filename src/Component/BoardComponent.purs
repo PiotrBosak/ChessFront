@@ -51,6 +51,7 @@ type State =
   }
 
 data Action = Click D.Position | IsCheckOrMate
+someAction :: Action
 someAction = IsCheckOrMate
 
 boardComponent
@@ -90,8 +91,7 @@ mainComponent { selectedPosition: selected, game: (Game game) } =
       [ HC.style $ (C.display C.block) *> (C.marginLeft auto) *> (C.marginRight auto) ]
       [ HH.div
           [ HC.style $ (C.display C.block) ]
-          [ HH.h1_ [ HH.text "cos jeszcze nowszego" ]
-          , ( HH.table
+          [ ( HH.table
                 [ HC.style $ (C.borderSpacing (C.nil)) *> (C.marginLeft auto) *> (C.marginRight auto) ]
                 $ map ((\a -> renderRank a selected game.turn) <<< getUnderRank)
                 $ fromFoldable sortedRanks

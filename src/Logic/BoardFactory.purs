@@ -1,7 +1,7 @@
 module BoardFactory (createBoard) where
 
 import Logic.Domain
-import Data.Map.Internal
+import Data.Map.Internal as Map
 import Data.Map
 import Data.Maybe
 import Prelude

@@ -4,6 +4,5 @@ import Prelude
 
 newtype GameId = GameId String
 type GameData =
-    { id :: GameId }
-
+  { id :: GameId }
 

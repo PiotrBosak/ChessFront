@@ -5,7 +5,7 @@ import Debug
 import Rules
 import Data.Tuple
 import Data.Map as M
-import Control.MonadZero
+import Control.Alternative (guard)
 import CheckRules
 import Data.Array
 import Data.Newtype

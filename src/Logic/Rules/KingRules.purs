@@ -1,6 +1,6 @@
 module KingRules where
 
-import Control.MonadZero
+import Control.Alternative (guard)
 import Data.Array
 import Data.Maybe
 import Data.Newtype

@@ -1,26 +1,27 @@
 module Component.Router where
 
-import Prelude
-import Debug
+import Capability.Navigate (class Navigate)
+import Capability.User (class ManageUser)
+import Data.Functor
+import Capability.Game.StartGame
+import Component.BoardComponent (boardComponent)
+import Component.WaitForGameComponent as WFGC
+import Component.HomePage (Output, homeComponent)
+import Data.Maybe (Maybe(..))
+import Data.Profile (Profile)
+import Data.Route (Route(..))
+import Debug (trace)
+import Prelude (Unit, Void, bind, discard, pure, show, unit, ($))
 import Component.GameTypeChooser as GTC
-import Data.Either (hush)
-import Halogen.HTML.Events as HE
-import Data.Foldable (elem)
-import Data.Maybe (Maybe(..), fromMaybe, isJust)
 import Effect.Aff.Class (class MonadAff)
 import Halogen as H
 import Halogen.HTML as HH
-import Halogen.Store.Connect (Connected, connect)
+import Halogen.Store.Connect (Connected)
 import Halogen.Store.Monad (class MonadStore)
-import Component.BoardComponent
-import Halogen.Store.Select (selectEq)
-import Routing.Duplex as RD
-import Routing.Hash (getHash)
+import Page.Login as Login
+import Page.Register as Register
+import Store as Store
 import Type.Proxy (Proxy(..))
-import Data.Route
-import Data.Profile
-import Data.Maybe
-import Component.HomePage
 
 data Query a = Navigate Route a
 type State =
@@ -33,23 +34,35 @@ data Action
   | ChangePage
   | Receive (Connected (Maybe Profile) Unit)
   | HandleButton Output
-  | HandleBoard GTC.Output
+  | HandleBoard GTC.Action
 
 type OpaqueSlot slot output = forall query. H.Slot query output slot
 
 type ChildSlots =
   ( home :: OpaqueSlot Unit Output
   , game :: OpaqueSlot Unit Unit
-  , board :: OpaqueSlot Unit GTC.Output
+  , board :: OpaqueSlot Unit GTC.Action
+  , login :: OpaqueSlot Unit Unit
+  , register :: OpaqueSlot Unit Unit
+  , waitForGame :: OpaqueSlot Unit Unit
   )
 
+initialState :: forall input. input -> State
 initialState _ =
   { route: Nothing
   , currentUser: Nothing
   }
 
-render :: forall m. MonadAff m => State -> H.ComponentHTML Action ChildSlots m
-render { route, currentUser } = case route of
+render
+  :: forall m
+   . MonadAff m
+  => ManageUser m
+  => Navigate m
+  => StartGame m
+  => MonadStore Store.Action Store.Store m
+  => State
+  -> H.ComponentHTML Action ChildSlots m
+render { route } = case route of
   Nothing ->
     HH.slot (Proxy :: _ "home") unit homeComponent unit HandleButton
   Just Board ->
@@ -57,12 +70,21 @@ render { route, currentUser } = case route of
   Just Home ->
     HH.slot (Proxy :: _ "home") unit homeComponent unit HandleButton
   Just Game ->
-    HH.slot_ (Proxy :: _ "game") unit (trace "plumbulka" \_ -> boardComponent) unit
+    HH.slot_ (Proxy :: _ "game") unit boardComponent unit
+  Just Login ->
+    HH.slot_ (Proxy :: _ "login") unit Login.component { redirect: false }
+  Just Register ->
+    HH.slot_ (Proxy :: _ "register") unit Register.component unit
+  Just WaitForGame ->
+    HH.slot_ (Proxy :: _ "waitForGame") unit WFGC.component unit
 
 routerComponent
   :: forall m
    . MonadAff m
-  -- => Navigate m
+  => Navigate m
+  => StartGame m
+  => ManageUser m
+  => MonadStore Store.Action Store.Store m
   => H.Component Query Unit Void m
 routerComponent =
   H.mkComponent
@@ -74,15 +96,23 @@ routerComponent =
         }
     }
 
-handleAction :: forall m. MonadAff m => Action -> H.HalogenM State Action ChildSlots Void m Unit
+handleAction
+    :: forall m
+     . MonadAff m
+    => StartGame m
+    => Action
+    -> H.HalogenM State Action ChildSlots Void m Unit
 handleAction = case _ of
   ChangePage -> do
-    state <- trace "Hit change page" \_ -> H.get
+    state <- H.get
     let
-      newState = trace "Plumba1" \_ -> state { route = Just Home }
+      newState = state { route = Just Home }
     H.put newState
   HandleButton _ -> do
-    H.modify_ _ { route = Just Game }
+    _ <- startMultiGame
+    _ <- trace "Hello, succeeded" \_ -> pure unit
+    H.modify_ _ { route = Just WaitForGame }
+  HandleBoard action -> pure unit
   _ -> do
     state <- H.get
     H.put state
